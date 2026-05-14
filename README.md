@@ -60,6 +60,82 @@ Every backup is **self-browsing**: a small `EmailArchiveViewer.exe` is dropped i
 backup root — a one-window viewer (folder dropdown, message list, detail pane) that reads
 both `.msg` and `.eml`. It needs the .NET 9 Desktop Runtime installed.
 
+## Download and run
+
+MailArchiver is a **command-line tool** — you don't double-click it, you run it from a
+terminal with a couple of arguments. It's still simple; this is the whole process.
+
+### 1. Download the right executable
+
+Go to the **[Releases](https://github.com/t-n-z/MailArchiver/releases)** page — *not* the
+green "Code" button (that's the source code). Under the latest release, download:
+
+- **`MailArchiver-Outlook.exe`** — if your mail is in Outlook.
+- **`MailArchiver-Mime.exe`** — if your mail is in Thunderbird, or you have `.mbox` /
+  Maildir / `.eml` files.
+
+Each is a single self-contained file — no installer, nothing else to grab. (The *viewer*
+that lands in your backup needs the free
+[.NET 9 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/9.0) if you want to
+browse the backup later; the archiver itself needs nothing.)
+
+Put the `.exe` somewhere easy, e.g. `C:\MailArchiver\`.
+
+### 2. Find your mailbox
+
+**Outlook** — data files live in
+`C:\Users\<you>\AppData\Local\Microsoft\Outlook\`. Quick way: paste
+`%LOCALAPPDATA%\Microsoft\Outlook` into the File Explorer address bar. You'll see one or
+more `.ost` files (sometimes `.pst`); standalone `.pst` files are often in
+`Documents\Outlook Files\` instead.
+
+**Thunderbird** — your profile lives in
+`C:\Users\<you>\AppData\Roaming\Thunderbird\Profiles\`. Quick way: paste
+`%APPDATA%\Thunderbird\Profiles` into the address bar. Inside is a folder like
+`abcd1234.default-release` — that whole folder is what you point MailArchiver at.
+
+**Close Outlook / Thunderbird before running** — they lock their files while open. If you
+can't close them, add `--copy-first` and MailArchiver works from a temporary copy instead.
+
+### 3. Get the paths the easy way
+
+You need two paths: the mailbox (`--source`) and where the backup goes (`--out`).
+
+- **Shift + Right-click** a file or folder in File Explorer → **"Copy as path"** — gives
+  you the full path already in quotes, ready to paste.
+- **Shift + Right-click** an empty area inside a folder → **"Open PowerShell window here"** —
+  opens a terminal already sitting in that folder, so you don't have to type your way to it.
+
+### 4. Run it
+
+Open a terminal in the folder where you put the `.exe` (Shift + Right-click → "Open
+PowerShell window here", or press `Win+R` and type `cmd`). Then run it — for example, an
+Outlook user backing up one account to an external drive:
+
+```
+MailArchiver-Outlook.exe --source "C:\Users\Tom\AppData\Local\Microsoft\Outlook\tom@example.com.ost" --out "E:\Mail Backup\tom@example.com"
+```
+
+A Thunderbird user backing up their whole profile (every account at once):
+
+```
+MailArchiver-Mime.exe --source "C:\Users\Tom\AppData\Roaming\Thunderbird\Profiles\abcd1234.default-release" --out "E:\Mail Backup\thunderbird"
+```
+
+### What happens next
+
+It opens the mailbox **read-only**, walks every folder, and writes each email as its own
+file under `--out`, mirroring the folder layout — e.g.
+`E:\Mail Backup\tom@example.com\...\Inbox\20250512_103000_Alice_Bob_Project_update.msg`.
+A live progress line shows how it's going; at the end it prints a summary. You'll find an
+`EmailArchiveViewer.exe` sitting in the backup root — double-click that any time to browse
+what was saved.
+
+**Re-run it whenever you like.** It only *adds* new mail and never touches what's already
+saved, so re-running (or scheduling it — see *Scheduling* below) just tops the backup up.
+Once you've confirmed a backup looks complete and correct, you can safely delete mail from
+the server to free up space.
+
 ## Usage
 
 ```
@@ -88,6 +164,22 @@ Exit codes: `0` ok, `1` finished with per-message errors, `2` fatal.
 
 Re-running is safe — already-archived messages are skipped via a SQLite index, and an
 interrupted run resumes from its last checkpoint. Nothing is ever deleted from a backup.
+
+## Scheduling
+
+Because re-running only adds new mail, MailArchiver is meant to be run on a schedule. Put
+your commands in a `.bat` file — lines run one after another, each finishing before the
+next starts:
+
+```bat
+@echo off
+MailArchiver-Outlook.exe --source "C:\...\account1.ost"        --out "E:\Mail Backup\account1" --quiet
+MailArchiver-Mime.exe    --source "C:\...\Thunderbird profile" --out "E:\Mail Backup\thunderbird" --quiet
+```
+
+Point Windows **Task Scheduler** at that `.bat` to run it daily/weekly. For unattended runs
+add `< nul` after a command so it never waits at a prompt (a locked file then just skips
+that line instead of asking). `--quiet` keeps the log short.
 
 ## Security — the backup is NOT encrypted
 
