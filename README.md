@@ -1,6 +1,6 @@
 # MailArchiver
 
-Mirrors a mailbox to disk as individual message files, preserving the folder structure —
+For windows. Mirrors a mailbox to disk as individual message files, preserving the folder structure —
 an additive, resumable, scriptable backup. The source is always opened **read-only**; the
 tool can never modify it. The output is **plain, unencrypted files** — see *Security* below.
 
