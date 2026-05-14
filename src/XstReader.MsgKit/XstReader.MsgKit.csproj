@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Vendored from github.com/iluvadev/XstReader (MS-PL), src/XstReader.Exporter/MsgKit
+       at commit da80989623f60685beaf5132948d32a3da48fd60. Only the MsgKit subtree is
+       included: it writes Outlook .msg files from an XstMessage and depends solely on
+       OpenMcdf and XstReader.Api. See THIRD-PARTY-NOTICES.md. -->
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>XstReader.Exporter.MsgKit</RootNamespace>
+    <AssemblyName>XstReader.MsgKit</AssemblyName>
+    <NoWarn>$(NoWarn);CS0168;CS0219;CS0414;CS0649;CS1591;CS8632</NoWarn>
+    <!-- NU1902: OpenMcdf 2.x carries advisory GHSA-jxpf-xq2m-q525, a DoS when *parsing*
+         malformed compound files. We only ever *write* .msg files from messages we read
+         ourselves, never parse untrusted compound files, so the vector is unreachable.
+         OpenMcdf 3.x fixes it but is an API-incompatible rewrite; 2.2.1.12 is the version
+         the upstream XstReader exporter was tested against. -->
+    <NoWarn>$(NoWarn);NU1902</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenMcdf" Version="2.2.1.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Vendored + patched (4K-OST decompression fix) — see XstReader.Api.csproj. -->
+    <ProjectReference Include="..\XstReader.Api\XstReader.Api.csproj" />
+  </ItemGroup>
+
+</Project>

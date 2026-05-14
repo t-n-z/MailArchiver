@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MailArchiver.Core/MailArchiver.Core.csproj" />
+    <Project Path="src/MailArchiver.Outlook/MailArchiver.Outlook.csproj" />
+    <Project Path="src/MailArchiver.Mime/MailArchiver.Mime.csproj" />
+    <Project Path="src/XstReader.Api/XstReader.Api.csproj" />
+    <Project Path="src/XstReader.MsgKit/XstReader.MsgKit.csproj" />
+    <Project Path="src/Viewer/Viewer.csproj" />
+  </Folder>
+</Solution>

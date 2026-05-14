@@ -1,0 +1,31 @@
+# Build output
+bin/
+obj/
+publish/
+[Dd]ebug/
+[Rr]elease/
+
+# Release executables — distribute via GitHub Releases, not the tree.
+# build.ps1 copies these to the repo root for local convenience.
+*.exe
+*.pdb
+
+# IDE / tooling
+.vs/
+*.user
+
+# Local scratch / test output
+_t/
+_t*/
+_t_*.log
+_*test*/
+
+# Real mailbox data must never be committed. Keep test fixtures synthetic.
+# (The example profile in this tree contains real credentials + email — keep it local only.)
+/example thunderbird profile folder/
+*.ost
+*.pst
+*.mbox
+
+# Note: src/embedded/.gitignore intentionally keeps the empty embedded/ directory
+# while ignoring the embedded viewer exe — leave that file in place.

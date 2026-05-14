@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>MailArchiver</RootNamespace>
+    <AssemblyName>MailArchiver-Outlook</AssemblyName>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MailArchiver.Core\MailArchiver.Core.csproj" />
+    <ProjectReference Include="..\XstReader.Api\XstReader.Api.csproj" />
+    <ProjectReference Include="..\XstReader.MsgKit\XstReader.MsgKit.csproj" />
+  </ItemGroup>
+
+  <!-- The WinForms viewer is embedded as a resource and extracted into each backup root at
+       runtime (EmbeddedViewer.cs, in Core). It is published into the shared src\embedded\
+       directory. Both archiver exes publish it with an *identical* PublishDir property
+       string (NormalizeDirectory resolves to the same absolute path), so MSBuild de-dups
+       the work — the viewer is published exactly once even in a parallel solution build. -->
+  <PropertyGroup>
+    <_EmbedDir>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..', 'embedded'))</_EmbedDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(_EmbedDir)EmailArchiveViewer.exe">
+      <LogicalName>EmailArchiveViewer.exe</LogicalName>
+      <Visible>false</Visible>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <Target Name="PublishViewer" BeforeTargets="BeforeCompile;CoreCompile">
+    <MSBuild Projects="$(MSBuildThisFileDirectory)..\Viewer\Viewer.csproj"
+             Targets="Publish"
+             Properties="Configuration=$(Configuration);TargetFramework=net9.0-windows;RuntimeIdentifier=win-x64;SelfContained=false;PublishSingleFile=true;PublishDir=$(_EmbedDir)" />
+  </Target>
+
+</Project>

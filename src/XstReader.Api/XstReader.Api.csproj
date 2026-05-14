@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Vendored from github.com/iluvadev/XstReader (MS-PL), src/XstReader.Api at commit
+       da80989623f60685beaf5132948d32a3da48fd60 — the same commit MsgKit was taken from,
+       so the two are guaranteed API-compatible.
+
+       LOCAL PATCH: NDB.ReadAndDecompress (the IsUnicode4K branch) was changed to bound
+       the DeflateStream to the block's actual compressed length. Upstream wraps the raw
+       file stream with no limit, so a 4K-format OST (wVer 0x24) decompresses far past
+       each block — minutes per message, looks like a hang. Search "LOCAL PATCH" in NDB.cs. -->
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>XstReader</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS0168;CS0219;CS0414;CS0649;CS1591;CS8632;CS0162;CS0067;CA2022</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>
